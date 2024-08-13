@@ -147,6 +147,7 @@ vel_aphelion = np.linalg.norm(v[arg_aphelion])
 
 #print(r)
 print("pos_aphelion: ", pos_aphelion/1e9, "vel_aphelion: ",vel_aphelion/1e3)
+#print(r)
 
 
 
