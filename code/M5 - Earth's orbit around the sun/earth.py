@@ -45,7 +45,7 @@ dt = 3600 #s, after how many seconds we are going to update our simulation
 t_max = 3.154e7 #seconds in a year
 
 
-# # Time array to be used in numerical solution
+# # Time array to be used in numerical solutionsuppo
 t = np.arange(0, t_max, dt)
 #print(t.astype('int32'))
 
@@ -57,7 +57,7 @@ v = np.empty(shape=(len(t),2))
 r[0], v[0] = r_0, v_0
 
 # Choosing the numerical integration method
-method_integration = 'rk4'
+method_integration = 'euler'
 
 # Define a function that returns the acceleration vector of a given body when passed into the position vector
 
@@ -82,7 +82,10 @@ def euler(r,v,accn,dt):
 
     for i in range(1, len(t)): #not 0, because we already have the initial vetors fo r and v
         r[i] = r[i-1] + v[i-1]*dt
+        
         v[i] = v[i-1] + accn(r[i-1])*dt
+        #print(r[i], v[i],accn(r[i-1]))
+        
 
 
 # RK Integration
@@ -146,7 +149,7 @@ arg_aphelion = np.argmax(sizes)
 vel_aphelion = np.linalg.norm(v[arg_aphelion])
 
 #print(r)
-print("pos_aphelion: ", pos_aphelion/1e9, "vel_aphelion: ",vel_aphelion/1e3)
+#print("pos_aphelion: ", pos_aphelion/1e9, "vel_aphelion: ",vel_aphelion/1e3)
 #print(r)
 
 

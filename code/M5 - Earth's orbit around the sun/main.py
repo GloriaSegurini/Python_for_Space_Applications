@@ -45,3 +45,5 @@ arg_aphelion, vel_aphelion, pos_aphelion = at_aphelion(r, v)
 # Plot the simulated data
 plot_simulated_data(r, method_integration, arg_aphelion, vel_aphelion, pos_aphelion, 
                     planet_name, color_at_perihelion, color_at_aphelion)
+
+#print(v)
