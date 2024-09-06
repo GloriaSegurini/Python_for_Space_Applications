@@ -66,12 +66,14 @@ while run:
     for i in range(1000000):
      print('here')
 
-    draw_stars(star_list, radius)
-    
-    for event in pg.event.get():
+     for event in pg.event.get():
             
             if event.type == pg.QUIT:
-                run = False         
+                run = False
+                
+    draw_stars(star_list, radius)
+    
+             
     pg.display.update()
     
 

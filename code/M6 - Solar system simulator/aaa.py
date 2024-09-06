@@ -42,6 +42,7 @@ class SolarSystemBodies:
      G = 6.6743e-11
      dt = 24*3600 #seconds in a day
      
+     
      def __init__(self, name, color, x,y, mass, radius):
           self.name = name
           self.color = color
@@ -54,6 +55,9 @@ class SolarSystemBodies:
           self.orbit = []
           self.sun = False
           self.distance_to_sun = 0
+          
+          
+          #self.acc = 0
     
     # Method 1: draw bodies on the simulator
      def draw_body(self, WINDOW):
@@ -65,7 +69,6 @@ class SolarSystemBodies:
         if not self.sun: # -> if self.sun==False
             name_text=NAME_TEXT.render(self.name, True, NAME_TEXT_COLOR)
             WINDOW.blit(name_text,(x-40,y-55))
-            #print(self.distance_to_sun)
             dist_text = DIST_TEXT.render(f"{round(self.distance_to_sun/(3e8*60), 3)} lt-min", True, DIST_TEXT_COLOR)
             WINDOW.blit(dist_text,(x-40,y-35))
         else:
@@ -74,53 +77,108 @@ class SolarSystemBodies:
              dist_text = DIST_TEXT.render(f"{round(self.x/3e8, 3), round(self.y/3e8, 3)} lt-sec", True, DIST_TEXT_COLOR)
              WINDOW.blit(dist_text,(x-40,y-35))
              
-          
+      
 
-
-    # Method 2: calculate the gravitational force
-     def gravitational_force(self, ss_body):
-        # F = GMm/r^2
-
-        x_diff = ss_body.x - self.x 
-        #print("QUI", x_diff)
+     def acceleration(self, ss_body):
+        G = 6.6743e-11
+        x_diff = ss_body.x - self.x
         y_diff = ss_body.y - self.y
-        distance = math.sqrt(x_diff**2 + y_diff**2) #take euclidean distance
-        #print("QUI2", distance)
-        if ss_body.sun:
-             self.distance_to_sun = distance
+        r_size = math.sqrt(x_diff**2 + y_diff**2)
+        
+        if r_size == 0:  # evitare divisione per zero
+            return 0, 0
+        
+        # Calcolo dell'accelerazione
+        a = G * ss_body.mass / r_size**2
+        #print("HERE ", a)
+        # Direzione dell'accelerazione
+        theta = math.atan2(x_diff,y_diff)
+        
      
-        g_force = self.G * self.mass * ss_body.mass / distance**2
+        a_x = a * x_diff / r_size
+        a_y = a * y_diff / r_size
 
-        # calculating g_force gives the force's magnitude, not its direction. We must treat it as a vectorial quantity
-        theta = math.atan2(y_diff,x_diff)
-        f_x = g_force * math.cos(theta)
-        f_y = g_force * math.sin(theta)
-        return f_x, f_y 
+        
+
+        if ss_body.sun:
+            self.distance_to_sun = r_size
+            
+        return a_x, a_y
+
+     def acceleration2(self, ss_body):
+         G = 6.6743e-11
+         x_diff = ss_body.x - self.x
+         y_diff = ss_body.y - self.y
+         r = np.array([x_diff, y_diff])  # Vettore distanza Venere-Mercurio
+         r_size = np.linalg.norm(r)  # Norm (modulo) del vettore distanza
+        
+         if ss_body.sun:
+            self.distance_to_sun = r_size
+        
+        # Calcolo dell'accelerazione usando la formula vettoriale
+         a_vector = (G * ss_body.mass / r_size**3) * r
+
+        # Estrazione delle componenti dell'accelerazione
+         a_x = a_vector[0] 
+         a_y = a_vector[1]
+         
+         
+         return a_x, a_y
      
+
+     def acceleration3(self, ss_body):
+        G = 6.6743e-11  # Costante gravitazionale
+        
+        # Calcolo delle differenze di posizione
+        x_diff = ss_body.x - self.x
+        y_diff = ss_body.y - self.y
+        
+        # Calcolo della distanza
+        r_size = math.sqrt(x_diff**2 + y_diff**2)
+        
+        if r_size == 0:  # evitare divisione per zero
+            return 0, 0
+        
+        # Calcolo dell'accelerazione scalare
+        a = G * ss_body.mass / r_size**2
+        
+        # Calcolo dell'angolo theta tra i due corpi
+        theta = math.atan2(y_diff, x_diff)  # Nota: atan2(y, x)
+        
+        # Componenti dell'accelerazione usando theta
+        a_x = a * math.cos(theta)
+        a_y = a * math.sin(theta)
+        
+        if ss_body.sun:
+            self.distance_to_sun = r_size  # aggiornamento opzionale
+        
+        return a_x, a_y
+
      # Method 3: update position
      def update_position(self, ss_bodies):
           net_fx, net_fy = 0,0
-          for body in ss_bodies:
-               #print(body)
-               if self != body:
-                    print("calcualting effect of ",body.name, " on ", self.name)
-                    f_x, f_y = self.gravitational_force(body)
-                    #print("grav force", f_x, f_y)
-                    net_fx+= f_x
-                    net_fy+=f_y
-                    #print("nets ", net_fx, net_fy)
+
+          for ss_body in ss_bodies:
+               if self != ss_body:  # Evita di calcolare la propria attrazione gravitazionale
+                    print("calcualting effect of ",ss_body.name, " on ", self.name)
+                    #dist = np.array([ss_body.x - self.x, ss_body.y - self.y])
+                    #r = np.array([self.x,self.y])
+                    a_x,a_y = self.acceleration3(ss_body)
+                    
+                    net_fx+=a_x
+                    net_fy+=a_y
+    
+    
+          # Aggiorna la velocità e la posizione
+          self.x_vel += self.dt * net_fx  # componente x dell'accelerazione
+          self.y_vel += self.dt * net_fy  # componente y dell'accelerazione
           
-          self.x_vel+=net_fx/self.mass*self.dt
-          self.y_vel+=net_fy/self.mass*self.dt
-          #print("VELOCITY ", self.x_vel, self.y_vel)
-          self.x+=self.x_vel*self.dt
-          self.y+=self.y_vel*self.dt
-          #self.x = np.round(self.x,14)
-          self.orbit.append((self.x,self.y))
+          self.x += self.x_vel * self.dt
+          self.y += self.y_vel * self.dt
 
-          if self.name == "Sun":
-               print("orbit ", sun.orbit)
 
+          self.orbit.append((self.x, self.y))
+        
 
      # Method 4 - ttack orbit
      def track_orbit(self, WINDOW):
@@ -163,8 +221,10 @@ def draw_stars(stars_list):
 run = True
 paused=False
 # Bodies
-sun = SolarSystemBodies("Sun", YELLOW, 0,0, 1.989e30, 30)
+sun = SolarSystemBodies("Sun", YELLOW, 0, 0.0, 1.989e30, 30)
 sun.sun=True
+#sun.x_vel = 0.004589483670395888
+#sun.y_vel = 0.0
 mercury = SolarSystemBodies("Mercury", GRAY, 0.39*SolarSystemBodies.AU, 0, 0.33e24, 6)
 mercury.y_vel = -47.4e3
 venus = SolarSystemBodies("Venus", YELLOWISH_WHITE, 0.72*SolarSystemBodies.AU, 0, 4.87e24, 14)
@@ -197,10 +257,11 @@ while run:
           print("Iteration for ",body.name,"***************************")
           body.update_position(ss_bodies)
           body.draw(WINDOW)
-     
+          
      print("SUN",sun.orbit)
      print("VENUS",venus.orbit)
      print("EARTH",earth.orbit)
+     
           
 
      pg.display.update()
