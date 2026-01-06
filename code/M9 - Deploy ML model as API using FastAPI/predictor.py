@@ -14,8 +14,6 @@ def make_predictions(model, input_features):
     classes = model.classes_    
     return predict_class, probabilities, classes
 
-print(make_predictions(model, input_features))
-
 
 
     
