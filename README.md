@@ -257,3 +257,78 @@ These outputs give a snapshot of where the satellite is and how fast it is movin
 The satellite’s estimated position is represented in a plotted orbit (if visualization is added), showing where it lies relative to Earth after the 4-hour interval.
 
 ![alt text](updated_sat.png)
+
+---
+
+## 🤖 M8 - Introduction to Machine Learning
+
+This module introduces the fundamentals of **Machine Learning** with a focus on **Linear Regression**. It covers the process of preparing data, training a model, and evaluating its performance using regression metrics.
+
+### Problem Statement
+
+- Understand the relationship between independent (features) and dependent variables (targets).
+- Implement a Linear Regression model to find the best-fit line for a given dataset.
+- Evaluate the model using metrics like Mean Squared Error (MSE) and R-squared.
+
+### Machine Learning Background
+
+Linear Regression aims to model the relationship between a scalar response $y$ and one or more explanatory variables $X$ using a linear equation:
+
+$$
+y = \beta_0 + \beta_1 x + \epsilon
+$$
+
+Where:
+- $\beta_0$ is the intercept.
+- $\beta_1$ is the slope (weight).
+- $\epsilon$ is the error term.
+
+### Implementation
+
+- `Linear_Regression.ipynb`: Jupyter notebook demonstrating data generation, feature scaling, model training with `scikit-learn`, and results visualization.
+
+### Output
+
+- Correlation analysis between variables.
+- Visual representation of the regression line against the data points.
+- Model performance summary (Coefficients, Intercept, MSE).
+
+---
+
+## 🚀 M9 - Deploy ML model as API using FastAPI
+
+This module demonstrates how to take a trained Machine Learning model and deploy it as a functional web service. The project focuses on a **Star Type Classification** system.
+
+### Problem Statement
+
+- Build a robust API to serve predictions for star classifications.
+- Classify stars into categories: **Red Dwarf, Brown Dwarf, White Dwarf, Main Sequence, Supergiant, Hypergiant**.
+- Ensure data validation and high performance for real-time inference.
+
+### Technical Stack
+
+- **FastAPI**: Modern web framework for building APIs.
+- **Scikit-Learn**: Framework used for the Machine Learning pipeline.
+- **Pydantic**: Data validation and structure.
+- **Uvicorn**: ASGI server to run the application.
+
+### Implementation
+
+- `star_tipe_prediction.ipynb`: A comprehensive Jupyter notebook that serves as the research and development phase. It includes:
+  - **Data Exploration**: Analyzing the star dataset (temperature, luminosity, etc.).
+  - **Preprocessing**: Feature scaling using `StandardScaler`.
+  - **Model Training**: Implementing a `LogisticRegression` classifier within a `Pipeline`.
+  - **Model Export**: Saving the final pipeline as `pipeline.pkl` for deployment.
+- `api.py`: The entry point that defines the FastAPI routes and prediction logic.
+- `predictor.py`: Contains helper functions to load the model and make predictions.
+- `star_data.py`: Defines the data models using Pydantic for input/output validation.
+- `pipeline.pkl`: The serialized pre-trained classification model.
+
+### Output
+
+- A RESTful endpoint `/predict` that accepts physical properties of a star (Temperature, Luminosity, Radius, Absolute Magnitude).
+- JSON responses containing:
+  - **Predicted Class**.
+  - **Probability Distribution** across all star types.
+  - **Confidence Score**.
+- Auto-generated documentation available via Swagger UI (`/docs`).
